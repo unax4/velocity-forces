@@ -1,26 +1,30 @@
 program taylor
 use tipoak
 use funtzioak
-real(kind=dp)::t,ta,tb,vint,xint,yint,fint,h
+use mcf_interpoli
+real(kind=dp)::xres,err,t,ta,tb,vint,xint,yint,fint,h,c
 real(kind=dp),dimension(2)::posi,velo,velint,for,forint
 integer::i,j,k
 integer::n
+real(kind=dp),dimension(:),allocatable::xn,yn,xni,yni
+real(kind=dp),parameter::mu=81.45_dp/82.45_dp,mup=1.0_dp/82.45_dp
 n=1000
-
+allocate(xn(100))
+allocate(yn(100))
+k=0
 j=1
 !proiektila
-ta=0.0_dp
-tb=10.0_dp
-t=ta
-h=(tb-ta)/n
-
-
+h=0.1
 posi=(/0.0_dp,0.0_dp/)
 velo=(/20.0_dp,20.0_dp/)
 
 open(unit=13,file="proiekt.dat",status="replace",action="write")
 
-do i=1,n
+do i=1,100
+k=k+1
+xn(i)=posi(1)
+yn(i)=posi(2)
+
 write(unit=13,fmt="(3f20.13)")t,posi
 write(unit=13,fmt=*)
 write(unit=13,fmt=*)
@@ -34,17 +38,27 @@ call fg(velint(1),velint(2),forint(1),forint(2))
 
 velo=velo + (for+forint)*h/2
 t=t+h
-
-if (posi(2)<0) then
-
+if (j==0) then
 exit
 end if
 
-end do
+if (posi(2)<0) then
+j=0
+end if
 
+end do
+allocate(xni(2))
+allocate(yni(2))
+xni=(/xn(k-1),xn(k)/)
+yni=(/yn(k-1),yn(k)/)
+
+
+call polint(yni,xni,2,0.0_dp,xres,err)
+print*,xres
 
 !magnetikoa
 t=0.0
+j=1
 
 posi=(/1.0_dp,0.0_dp/)
 velo=(/0.0_dp,2*acos(-1.0_dp)/)
@@ -110,7 +124,11 @@ velo=(/0.0_dp,1.049357509830_dp/)
 
 open(unit=16,file="orb.dat",status="replace",action="write")
 do i=1,n
-write(unit=16,fmt="(3f20.13)")t,posi
+if (t>6.20) then
+exit
+end if
+c=(velo(1)**2+velo(2)**2-posi(1)**2-posi(2)**2)/2-mu/sqrt((posi(1)+mup)**2+posi(2)**2)-mup/sqrt((posi(1)-mu)**2+posi(2)**2)
+write(unit=16,fmt="(4f20.13)")t,posi,c
 write(unit=16,fmt=*)
 write(unit=16,fmt=*)
 
