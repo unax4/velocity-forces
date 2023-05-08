@@ -6,7 +6,7 @@ contains
 subroutine fg(vx,vy,fx,fy)
 real(kind=dp),intent(in)::vx,vy
 real(kind=dp),intent(inout)::fx,fy
-real(kind=dp),parameter::b=0.5_dp,m=2.0_dp,g=9.8_dp
+real(kind=dp),parameter::b=0.3_dp,m=2.0_dp,g=9.8_dp
 
 fx=-b*vx
 fy=-b*vy - g
@@ -32,7 +32,7 @@ end subroutine fharm
 subroutine forbi(x,y,vx,vy,fx,fy)
 real(kind=dp),intent(in)::x,y,vx,vy
 real(kind=dp),intent(out)::fx,fy
-real(kind=dp),parameter::pi=acos(-1.0_dp),mu=81.45_dp/82.45_dp,mup=1.0_dp/82.45_dp
+real(kind=dp),parameter::pi=acos(-1.0_dp),mu=81.45_dp/82.45_dp,mup=1.0_dp/81.45_dp
 fx=x + 2*vy - mu*(x+mup)/((x+mup)**2+y**2)**(3/2) - mup*(x-mu)/((x-mup)**2+y**2)**(3/2)
 fy=y - 2*vx - mu*y/((x+mup)**2+y**2)**(3/2) - mup*y/((x-mup)**2+y**2)**(3/2)
 end subroutine forbi
