@@ -2,23 +2,28 @@ program taylor0
 use tipoak
 use funtzioak
 use mcf_interpoli
-real(kind=dp)::t,ta,tb,h,xres,errorea
+real(kind=dp)::t,ta,tb,h,xres,errorea,b,c
 real(kind=dp),dimension(2)::posi,velo,for,xni,yni
 real(kind=dp),dimension(100)::xn,yn
-integer::i,j,k
+integer::i,j,k,p
 integer::n
+real(kind=dp),parameter::mu=81.45_dp/82.45_dp,mup=1.0_dp/82.45_dp !C-ren kalkulurako
 n=1000
-j=0
-k=0
+
 !proiektila
+b=0.0_dp
 ta=0.0_dp
 tb=10.0_dp
 t=ta
 h=0.1
+open(unit=17,file="proiekt0.dat",status="replace",action="write")
 
+do p=1,5
+k=0
+j=0
 posi=(/0.0_dp,0.0_dp/)
 velo=(/20.0_dp,20.0_dp/)
-open(unit=17,file="proiekt0.dat",status="replace",action="write")
+
 do i=1,100
 j=j+1
 xn(i)=posi(1)
@@ -27,7 +32,7 @@ yn(i)=posi(2)
 write(unit=17,fmt="(3f20.13)")t,posi
 write(unit=17,fmt=*)
 write(unit=17,fmt=*)
-call fg(velo(1),velo(2),for(1),for(2))
+call fg(velo(1),velo(2),for(1),for(2),b)
 posi=posi + h*velo + for*h**2/2
 velo=velo + for*h
 
@@ -44,7 +49,8 @@ xni=(/xn(j-1),xn(j)/)
 yni=(/yn(j-1),yn(j)/)
 call POLINT(yni,xni,2,0.0_dp,xres,errorea)
 print*,xres
-
+b=b+0.5_dp
+end do
 !magnetikoa
 n=1000
 t=0.0
@@ -69,32 +75,38 @@ end if
 end do
 
 !harmonikoa
-t=0.0
+t=0.0_dp
+tb=10.0_dp
 h=(tb-t)/n
-posi=(/0.0_dp,0.0_dp/)
+posi=(/10.0_dp,0.0_dp/)
 velo=(/0.0_dp,0.0_dp/)
-
+n=5000
 open(unit=19,file="harm0.dat",status="replace",action="write")
 do i=1,n
 write(unit=19,fmt="(3f20.13)")t,posi
-call fharm(t,posi(1),posi(2),velo(1),velo(2),for(1),for(2))
+call fharm(t,posi(1),velo(1),for(1))
 posi=posi + h*velo + for*h**2/2
 velo=velo + for*h
 t=t+h
 end do
 
 !grabitatorioa
-t=0.0
-tb=100
-n=10000
+t=0.0_dp
+t=20.0_dp
+!tb=6.192169331396_dp
+n=1200000
 h=(tb-t)/n
+
 posi=(/1.2_dp,0.0_dp/)
-velo=(/0.0_dp,1.049357509830_dp/)
+velo=(/0.0_dp,-1.049357509830_dp/)
 
 open(unit=20,file="orb0.dat",status="replace",action="write")
 
 do i=1,n
-write(unit=20,fmt="(3f20.13)")t,posi
+c=(velo(1)**2.0_dp+velo(2)**2.0_dp-posi(1)**2.0_dp-posi(2)**2.0_dp)/2&
+-mu/((posi(1)+mup)**2.0_dp+posi(2)**2.0_dp)**(1.0_dp/2.0_dp)&
+-mup/((posi(1)-mu)**2.0_dp+posi(2)**2.0_dp)**(1.0_dp/2.0_dp)
+write(unit=20,fmt="(4f20.13)")t,posi,c
 
 call forbi(posi(1),posi(2),velo(1),velo(2),for(1),for(2))
 posi=posi + h*velo + for*h**2/2
