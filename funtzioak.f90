@@ -1,6 +1,6 @@
 module funtzioak 
 use tipoak
-public::fg,fmag,fharm,forbi
+public::fg,fg2,fmag,fharm,forbi
 
 contains
 subroutine fg(vx,vy,fx,fy,b)
@@ -12,10 +12,25 @@ fx=-b*vx
 fy=-b*vy - g
 end subroutine fg
 
+
+subroutine fg2(vx,vy,fx,fy,b)
+real(kind=dp),intent(in)::vx,vy,b
+real(kind=dp),intent(inout)::fx,fy
+real(kind=dp),parameter::m=2.0_dp,g=9.8_dp
+real(kind=dp)::v
+v=sqrt(vx**2+vy**2)
+
+fx=-b*vx*v
+fy=-b*vy*v - g
+end subroutine fg2
+
+
+
+
 subroutine fmag(vx,vy,fx,fy)
 real(kind=dp),intent(in)::vx,vy
 real(kind=dp),intent(out)::fx,fy
-real(kind=dp),parameter::B=2*acos(-1.0_dp),q=1.0_dp,m=1.0_dp
+real(kind=dp),parameter::B=2*acos(-1.0_dp),q=-1.0_dp,m=1.0_dp
 fx=B*q*vy/m
 fy=-B*q*vx/m
 end subroutine fmag
@@ -25,7 +40,7 @@ subroutine fharm(t,x,vx,fx)
 real(kind=dp),intent(in)::vx,x,t
 real(kind=dp),intent(out)::fx
 real(kind=dp),parameter::pi=acos(-1.0_dp)
-real(kind=dp), parameter:: c1=100.0_dp, c2=0.0_dp, w1=2*pi, gamba=1.0_dp, A=1.0_dp, w=pi, psi=0.0_dp
+real(kind=dp), parameter:: c1=0.0_dp, c2=100.0_dp, w1=2*pi, gamba=1.0_dp, A=1.0_dp, w=pi, psi=0.0_dp
 real (kind=dp):: w0, F, nu
 w0= sqrt(w1**2+gamba**2)
 F= A*sqrt((w0**2-w**2)**2+(2.0_dp*gamba*w)**2)
